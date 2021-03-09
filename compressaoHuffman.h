@@ -5,6 +5,7 @@
 
 typedef struct TreeNode {
     void *element;
+    int freq;
     struct TreeNode *left;
     struct TreeNode *right;
 } TreeNode;

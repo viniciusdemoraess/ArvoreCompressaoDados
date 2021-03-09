@@ -1,5 +1,5 @@
 #include "compressaoHuffman.h" 
-// adiciona um novo n� na �rvore 
+// adiciona um novo no na arvore 
 int add(TreeNode **root, void *element, TreeComparator f) {
     if ((*root) == NULL) {
         // alcan�ou o local da folha, atualiza o pai
@@ -53,14 +53,6 @@ void in_order(TreeNode *root, printNode print) {
         in_order(root->right, print); //percorre para direita até encontrar NULL
     }
 }
-//impressão dos elementos na forma posfixa  
-void pre_order(TreeNode *root, printNode print) {
-    if (root!=NULL) {
-        print(root->element); //imprime raiz
-        pre_order(root->left, print); //percorre até o elemento mais a esquerda
-        pre_order(root->right, print); //percorre até o elemento mais a direita
-    }
-}
 //Exibe os elementos da árvore na ordem Esquerda Direita Raiz 
 void post_order(TreeNode *root, printNode print) {
     if(root!=NULL) {
@@ -97,52 +89,6 @@ TreeNode *smallerLeft(TreeNode **no){
             *no = NULL;
         return aux;
     }
-}
-
-//remove um nó/elemento da arvore binaria
-int removeTreeNode(TreeNode **root, void *key, TreeComparator f) {
-    if(*root == NULL){   // caso a chave nao exista na arvore
-        return 0;
-    }
-    int compvalue = f(key, (*root)->element);
-    if(compvalue < 0){
-        removeTreeNode(&(*root)->left, key, f);
-    }else {
-        if(compvalue > 0) {
-            removeTreeNode(&(*root)->right, key, f);
-        } else {    // se nao eh igual
-            TreeNode *aux = *root;
-            // Se nao tem filhos
-            if (((*root)->left == NULL) && ((*root)->right == NULL)){
-                free(aux);
-                (*root) = NULL;
-            }
-            else{ // so tem o filho da direita
-                if ((*root)->left == NULL){
-                    (*root) = (*root)->right;
-                    aux->right = NULL;
-                    free(aux);
-                    aux = NULL;
-                }
-                else{ //so tem filho da esquerda
-                    if ((*root)->right == NULL){
-                        (*root) = (*root)->left;
-                        aux->left = NULL;
-                        free(aux); 
-                        aux = NULL;
-                    }
-                    else{ //Busco o maior filho à direita da subarvore esquerda.
-                        aux = greaterRight(&(*root)->left);
-                        aux->left = (*root)->left;
-                        aux->right = (*root)->right;
-                        (*root)->left = (*root)->right = NULL;
-                        free((*root));  *root = aux;  aux = NULL;
-                    }
-                }
-            }
-        }
-    }
-    return 1;
 }
 
 // Calcula a altura da ávore/subárvore 
