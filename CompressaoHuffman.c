@@ -4,11 +4,13 @@
 #include <math.h>
 #include <ctype.h>
 #include <stdbool.h>
+//#include "compressaoHuffman.h"
 
 /** Definição do tipo de dados 'byte'
 unsigned char': É o tipo que consegue gravar no intervalo que vai de 0 a 255 bytes
 */
-typedef char byte;
+
+typedef unsigned char byte;
 
 /** Definição da árvore */
 typedef struct nodeArvore{
@@ -29,17 +31,6 @@ typedef struct lista{
     nodeLista   *head;
     int         elementos;
 }lista;
-
-/**
-* A função strdup é dependente de implementação nas plataformas não POSIX (Windows, etc)
-* Segue uma implementação desta função como solução para o problema.
-*/
-
-char *strdup(const char *s){
-    char *p = malloc(strlen(s) + 1);
-    if (p) strcpy(p, s);
-    return p;
-}
 
 /** Função que faz alocação de memória e trata os ponteiros soltos acerca de nós da lista encadeada.
 * Obs: cada nó da lista encadeada é conectado a um nó 'raiz' de árvore.
@@ -189,7 +180,6 @@ bool pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho){
 
     // Caso base da recursão:
     // Se o nó for folha e o seu valor for o buscado, colocar o caractere terminal no buffer e encerrar
-
     if (!(n->esquerda || n->direita) && n->c == c){
         buffer[tamanho] = '\0';
         return true;
@@ -274,40 +264,38 @@ void FreeHuffmanTree(nodeArvore *n){
     }
 }
 
-/** Função que faz bitmasking no byte lido e retorna um valor booleano confirmando sua existência
-* Ideia do bitmasking surgiu da leitura de http://ellard.org/dan/www/CS50-95/s10.html
-* @param: arquivo para ler o byte, posição que se deseja mascarar o byte, byte a ser feita a checagem
-*/
-
-int geraBit(FILE *entrada, int posicao, byte *aux )
-{
-    // É hora de ler um bit?
-    (posicao % 8 == 0) ? fread(aux, 1, 1, entrada) : NULL == NULL ;
-
-    // Exclamação dupla converte para '1' (inteiro) se não for 0. Caso contrário, deixa como está (0)
-    // Joga '1' na casa binária 'posicao' e vê se "bate" com o byte salvo em *aux do momento
-    // Isso é usado para percorrer a árvore (esquerda e direita)
-    return !!((*aux) & (1 << (posicao % 8)));
-}
-
-/** Função para notificar ausência do arquivo. Encerra o programa em seguida.
-*/
+// Função para notificar ausência do arquivo. Encerra o programa em seguida.
 void erroArquivo(){
     printf("Arquivo nao encontrado\n");
     exit(0);
-}
+}/*
+char find(unsigned *listaBytes, nodeArvore *n) {
+    int compvalue;
+    char resposta[256]; 
+    // Passamos a folha
+    if (n == NULL)
+        return 0;
+    for(int i=0; i < 256; i++){
+        compvalue = strcmp(listaBytes[i], n->c);
+        if (compvalue == 0) {
+            // encontrado
+            listaBytes[i] = n->c;
+            return 1;
+        }
+        // desce no nível da árvore
+        if (compvalue > 0)
+            return find(listaBytes[i], n->direita);
+    }   
+    return find(listaBytes, n->esquerda);
+}*/
 
-void printa(FILE *Arq, nodeArvore *n){
-    if(!Arq) erroArquivo(); 
-    char buffer;   
+void printa(unsigned *listaBytes, nodeArvore *n){
+    unsigned listaBytes[256] = {0};
     byte c;
     printf("---------------TABELA--------------\n");
-    do{
-       c = getc(Arq);
-       if(!isspace(c)){
-        printf(" %c  ===  %d \n", c);
-       }      
-    }while(c != EOF); 
+    for(int i=0; i< 256; i++){
+        printf(" %d  == %d\n", i, listaBytes[i]);
+    }
 }
 
 int execution(const char *t){    
@@ -315,9 +303,10 @@ int execution(const char *t){
     FILE *Arq = fopen(t, "r");
     unsigned listaBytes[256] = {0};
     if(!Arq) erroArquivo();    
-    getByteFrequency(Arq, listaBytes); 
+    getByteFrequency(Arq, listaBytes);
     nodeArvore *raiz = BuildHuffmanTree(listaBytes);        
-    printa(Arq, raiz);
+    //fread(listaBytes, 256, sizeof(listaBytes[0]), Arq);        
+   // printa(listaBytes, raiz);
     fclose(Arq);
 }
 

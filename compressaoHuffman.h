@@ -18,6 +18,7 @@ int add(TreeNode **root, void *element, TreeComparator f);
 int find(TreeNode *root, void *key, TreeComparator f, void **element);
 void in_order(TreeNode *root, printNode print);
 void pre_order(TreeNode *root, printNode print);
+char pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho);
 void post_order(TreeNode *root, printNode print);
 int removeTreeNode(TreeNode **root, void *key, TreeComparator f);
 int height (TreeNode *root);
