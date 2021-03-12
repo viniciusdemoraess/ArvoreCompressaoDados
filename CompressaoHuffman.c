@@ -4,38 +4,7 @@
 #include <math.h>
 #include <ctype.h>
 #include <stdbool.h>
-//#include "compressaoHuffman.h"
-
-/** Definição do tipo de dados 'byte'
-unsigned char': É o tipo que consegue gravar no intervalo que vai de 0 a 255 bytes
-*/
-
-typedef unsigned char byte;
-
-/** Definição da árvore */
-typedef struct nodeArvore{
-    int                 frequencia;
-    byte                c;
-    struct nodeArvore   *esquerda;
-    struct nodeArvore   *direita;
-}nodeArvore;
-
-/** Definição da fila de prioridade (implementada como lista simplesmente encadeada) */
-
-typedef struct nodeLista{
-    nodeArvore          *n;
-    struct nodeLista    *proximo;
-} nodeLista;
-
-typedef struct lista{
-    nodeLista   *head;
-    int         elementos;
-}lista;
-
-/** Função que faz alocação de memória e trata os ponteiros soltos acerca de nós da lista encadeada.
-* Obs: cada nó da lista encadeada é conectado a um nó 'raiz' de árvore.
-* @param: um nó de uma árvore.
-*/
+#include "compressaoHuffman.h"
 
 nodeLista *novoNodeLista(nodeArvore *nArv){
     // Aloca memória
@@ -176,8 +145,7 @@ void getByteFrequency(FILE *entrada, unsigned int *listaBytes){ // Usar isso par
 / @param: nó para iniciar a busca, byte a ser buscado, buffer para salvar os nós percorridos, posição para escrever
 **/
 
-bool pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho){
-
+bool pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho, unsigned int *listaBytes){
     // Caso base da recursão:
     // Se o nó for folha e o seu valor for o buscado, colocar o caractere terminal no buffer e encerrar
     if (!(n->esquerda || n->direita) && n->c == c){
@@ -188,24 +156,28 @@ bool pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho){
         bool encontrado = false;
 
         // Se existir um nó à esquerda
-        if (n->esquerda)        {
+        if (n->esquerda){
             // Adicione '0' no bucket do buffer correspondente ao 'tamanho' nodeAtual
-            buffer[tamanho] = '0';
+            buffer[tamanho] = '1';
 
             // fazer recursão no nó esquerdo
-            encontrado = pegaCodigo(n->esquerda, c, buffer, tamanho + 1);
+            encontrado = pegaCodigo(n->esquerda, c, buffer, tamanho + 1, listaBytes);
+
         }
 
         if (!encontrado && n->direita){
-            buffer[tamanho] = '1';
-            encontrado = pegaCodigo(n->direita, c, buffer, tamanho + 1);
+            buffer[tamanho] = '0';
+            encontrado = pegaCodigo(n->direita, c, buffer, tamanho + 1, listaBytes);
         }
+
         if (!encontrado){
             buffer[tamanho] = '\0';
+            return false;
         }
-        return encontrado;
     }
-
+    for(int i=0; i<=256; i++){
+        printf("%d || %c \n", listaBytes[i], buffer[i]);
+    }
 }
 
 nodeArvore *BuildHuffmanTree(unsigned *listaBytes){
@@ -289,15 +261,15 @@ char find(unsigned *listaBytes, nodeArvore *n) {
     return find(listaBytes, n->esquerda);
 }*/
 
-void printa(unsigned *listaBytes, nodeArvore *n){
-    unsigned listaBytes[256] = {0};
+/*void printa(nodeArvore *n, unsigned int *listaBytes){
+    char buffer[256] = {0};
     byte c;
     printf("---------------TABELA--------------\n");
     for(int i=0; i< 256; i++){
-        printf(" %d  == %d\n", i, listaBytes[i]);
+        printf(" %d  == %c\n", listaBytes[i]);
     }
 }
-
+*/
 int execution(const char *t){    
     //abrindo o arquivo txt em modo "somente leitura"
     FILE *Arq = fopen(t, "r");
@@ -306,7 +278,7 @@ int execution(const char *t){
     getByteFrequency(Arq, listaBytes);
     nodeArvore *raiz = BuildHuffmanTree(listaBytes);        
     //fread(listaBytes, 256, sizeof(listaBytes[0]), Arq);        
-   // printa(listaBytes, raiz);
+    printa(raiz, listaBytes);
     fclose(Arq);
 }
 
