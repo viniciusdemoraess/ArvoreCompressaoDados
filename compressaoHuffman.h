@@ -3,25 +3,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef struct TreeNode {
-    void *element;
-    int freq;
-    struct TreeNode *left;
-    struct TreeNode *right;
-} TreeNode;
+typedef unsigned char byte;
 
-typedef int (*TreeComparator)(void *element1, void *element2);
+typedef struct nodeArvore{
+    int                 frequencia;
+    byte                c;
+    struct nodeArvore   *esquerda;
+    struct nodeArvore   *direita;
+}nodeArvore;
 
-typedef void (*printNode)(void*);
+typedef struct nodeLista{
+    nodeArvore          *n;
+    struct nodeLista    *proximo;
+} nodeLista;
 
-int add(TreeNode **root, void *element, TreeComparator f);
-int find(TreeNode *root, void *key, TreeComparator f, void **element);
-void in_order(TreeNode *root, printNode print);
-void pre_order(TreeNode *root, printNode print);
-char pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho);
-void post_order(TreeNode *root, printNode print);
-int removeTreeNode(TreeNode **root, void *key, TreeComparator f);
-int height (TreeNode *root);
-void destroy (TreeNode **root);
+typedef struct lista{
+    nodeLista   *head;
+    int         elementos;
+}lista;
 
-//#endif
+
+
