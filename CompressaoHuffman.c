@@ -2,43 +2,40 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
 #include <stdbool.h>
 
 /** Definição do tipo de dados 'byte'
-* 'unsigned char': É o tipo que consegue gravar no intervalo que vai de 0 a 255 bytes
+unsigned char': É o tipo que consegue gravar no intervalo que vai de 0 a 255 bytes
 */
-typedef unsigned char byte;
+typedef char byte;
 
 /** Definição da árvore */
-typedef struct nodeArvore
-{
+typedef struct nodeArvore{
     int                 frequencia;
     byte                c;
     struct nodeArvore   *esquerda;
     struct nodeArvore   *direita;
-} nodeArvore;
+}nodeArvore;
 
 /** Definição da fila de prioridade (implementada como lista simplesmente encadeada) */
 
-typedef struct nodeLista
-{
+typedef struct nodeLista{
     nodeArvore          *n;
     struct nodeLista    *proximo;
 } nodeLista;
 
-typedef struct lista
-{
+typedef struct lista{
     nodeLista   *head;
     int         elementos;
-} lista;
+}lista;
 
 /**
 * A função strdup é dependente de implementação nas plataformas não POSIX (Windows, etc)
 * Segue uma implementação desta função como solução para o problema.
 */
 
-char *strdup(const char *s)
-{
+char *strdup(const char *s){
     char *p = malloc(strlen(s) + 1);
     if (p) strcpy(p, s);
     return p;
@@ -49,8 +46,7 @@ char *strdup(const char *s)
 * @param: um nó de uma árvore.
 */
 
-nodeLista *novoNodeLista(nodeArvore *nArv)
-{
+nodeLista *novoNodeLista(nodeArvore *nArv){
     // Aloca memória
     nodeLista *novo;
     if ( (novo = malloc(sizeof(*novo))) == NULL ) return NULL;
@@ -68,8 +64,7 @@ nodeLista *novoNodeLista(nodeArvore *nArv)
 * @param: o byte a ser gravado no nó, a frequencia do byte, ponteiros para os nós filhos
 */
 
-nodeArvore *novoNodeArvore(byte c, int frequencia, nodeArvore *esquerda, nodeArvore *direita)
-{
+nodeArvore *novoNodeArvore(byte c, int frequencia, nodeArvore *esquerda, nodeArvore *direita){
     // Aloca memória
     nodeArvore *novo;
 
@@ -88,8 +83,7 @@ nodeArvore *novoNodeArvore(byte c, int frequencia, nodeArvore *esquerda, nodeArv
 * @param: um nó previamente criado, a lista que receberá o nó
 */
 
-void insereLista(nodeLista *n, lista *l)
-{
+void insereLista(nodeLista *n, lista *l){
     // Se a lista passada como parâmetro não tem um nó no início (vazia), insira o nó no início
     if (!l->head)
     {
@@ -99,13 +93,11 @@ void insereLista(nodeLista *n, lista *l)
     // Se o campo 'frequência' do 'nó' parâmetro for menor que o campo 'frequência' do primeiro item (head)
     // da lista, incluir o novo nó como head, e colocar o head antigo como next desse novo
 
-    else if (n->n->frequencia < l->head->n->frequencia)
-    {
+    else if (n->n->frequencia < l->head->n->frequencia){
         n->proximo = l->head;
         l->head = n;
     }
-    else
-    {
+    else{
         // nó auxiliar que inicia apontando para o segundo nó da lista (head->proximo)
         nodeLista *aux = l->head->proximo;
         // nó auxiliar que inicia apontando para o primeiro nó da lista
@@ -117,8 +109,7 @@ void insereLista(nodeLista *n, lista *l)
         // Sendo assim, os ponteiros seguirão mudando de posição enquanto aux não for o fim da lista,
         // e enquanto a frequência do nó apontado por aux for menor ou igual a frequência do 'nó' parâmetro.
 
-        while (aux && aux->n->frequencia <= n->n->frequencia)
-        {
+        while (aux && aux->n->frequencia <= n->n->frequencia){
             aux2 = aux;
             aux = aux2->proximo;
         }
@@ -137,8 +128,7 @@ void insereLista(nodeLista *n, lista *l)
 * @param: uma lista encadeada.
 */
 
-nodeArvore *popMinLista(lista *l)
-{
+nodeArvore *popMinLista(lista *l){
 
     // Ponteiro auxilar que aponta para o primeiro nó da lista
     nodeLista *aux = l->head;
@@ -163,8 +153,7 @@ nodeArvore *popMinLista(lista *l)
 * @param: um arquivo, uma lista de bytes
 */
 
-void getByteFrequency(FILE *entrada, unsigned int *listaBytes)
-{
+void getByteFrequency(FILE *entrada, unsigned int *listaBytes){ // Usar isso para ler Arquivo
 
     byte c;
 
@@ -180,8 +169,7 @@ void getByteFrequency(FILE *entrada, unsigned int *listaBytes)
     *
     ***/
 
-    while (fread(&c, 1, 1, entrada) >= 1)
-    {
+    while (fread(&c, 1, 1, entrada) >= 1){
         listaBytes[(byte)c]++;
     }
     rewind(entrada); // "rebobina o arquivo"
@@ -197,24 +185,20 @@ void getByteFrequency(FILE *entrada, unsigned int *listaBytes)
 / @param: nó para iniciar a busca, byte a ser buscado, buffer para salvar os nós percorridos, posição para escrever
 **/
 
-bool pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho)
-{
+bool pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho){
 
     // Caso base da recursão:
     // Se o nó for folha e o seu valor for o buscado, colocar o caractere terminal no buffer e encerrar
 
-    if (!(n->esquerda || n->direita) && n->c == c)
-    {
+    if (!(n->esquerda || n->direita) && n->c == c){
         buffer[tamanho] = '\0';
         return true;
     }
-    else
-    {
+    else{
         bool encontrado = false;
 
         // Se existir um nó à esquerda
-        if (n->esquerda)
-        {
+        if (n->esquerda)        {
             // Adicione '0' no bucket do buffer correspondente ao 'tamanho' nodeAtual
             buffer[tamanho] = '0';
 
@@ -222,13 +206,11 @@ bool pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho)
             encontrado = pegaCodigo(n->esquerda, c, buffer, tamanho + 1);
         }
 
-        if (!encontrado && n->direita)
-        {
+        if (!encontrado && n->direita){
             buffer[tamanho] = '1';
             encontrado = pegaCodigo(n->direita, c, buffer, tamanho + 1);
         }
-        if (!encontrado)
-        {
+        if (!encontrado){
             buffer[tamanho] = '\0';
         }
         return encontrado;
@@ -236,25 +218,23 @@ bool pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho)
 
 }
 
-nodeArvore *BuildHuffmanTree(unsigned *listaBytes)
-{
+nodeArvore *BuildHuffmanTree(unsigned *listaBytes){
     // Lista com head apontando pra NULL e com campo 'elementos' valendo 0;
     lista l = {NULL, 0};
 
     // Popula usando a array 'listaBytes' (que contém as frequências) uma lista encadeada de nós.
     // Cada nó contém uma árvore.
-    for (int i = 0; i < 256; i++)
-    {
-        if (listaBytes[i]) // Se existe ocorrência do byte
-        {
+    for (int i = 0; i < 256; i++){
+        if (listaBytes[i]){// Se existe ocorrência do byte
+        
             // Insere na lista 'l' um nó referente ao byte i e sua respectiva frequência (guardada em listaBytes[i]).
             // Faz os nós esquerdo e direito das árvores apontarem para NULL;
             insereLista(novoNodeLista(novoNodeArvore(i, listaBytes[i], NULL, NULL)), &l);
         }
     }
 
-    while (l.elementos > 1) // Enquanto o número de elementos da lista for maior que 1
-    {
+    while (l.elementos > 1){// Enquanto o número de elementos da lista for maior que 1
+    
         // Nó esquerdo chama a função popMinLista() que vai na lista e pega a árvore fixada no primeiro nó
         // (que é a que contém a menor frequência)
         nodeArvore *nodeEsquerdo = popMinLista(&l);
@@ -281,8 +261,7 @@ nodeArvore *BuildHuffmanTree(unsigned *listaBytes)
 * @param: nó de uma (sub)árvore.
 */
 
-void FreeHuffmanTree(nodeArvore *n)
-{
+void FreeHuffmanTree(nodeArvore *n){
     // Caso base da recursão, enquanto o nó não for NULL
     if (!n) return;
     else
@@ -313,22 +292,38 @@ int geraBit(FILE *entrada, int posicao, byte *aux )
 
 /** Função para notificar ausência do arquivo. Encerra o programa em seguida.
 */
-void erroArquivo()
-{
+void erroArquivo(){
     printf("Arquivo nao encontrado\n");
     exit(0);
 }
 
+void printa(FILE *Arq, nodeArvore *n){
+    if(!Arq) erroArquivo(); 
+    char buffer;   
+    byte c;
+    printf("---------------TABELA--------------\n");
+    do{
+       c = getc(Arq);
+       if(!isspace(c)){
+        printf(" %c  ===  %d \n", c);
+       }      
+    }while(c != EOF); 
+}
+
+int execution(const char *t){    
+    //abrindo o arquivo txt em modo "somente leitura"
+    FILE *Arq = fopen(t, "r");
+    unsigned listaBytes[256] = {0};
+    if(!Arq) erroArquivo();    
+    getByteFrequency(Arq, listaBytes); 
+    nodeArvore *raiz = BuildHuffmanTree(listaBytes);        
+    printa(Arq, raiz);
+    fclose(Arq);
+}
+
 int main(int argc, char *argv[]){
-    // Caso os parâmetros informados sejam insuficientes
-    if (argc < 4){
-        printf("Uso: huffman [OPCAO] [ARQUIVO] [ARQUIVO]\n\n");
-        printf("Opcoes:\n");
-        printf("\t-c\tComprime\n");
-        printf("\t-x\tDescomprime\n");
-        printf("\nExemplo: ./huffman -c comprima.isso nisso.hx\n");
-        return 0;
-    }
+
+    execution(argv[1]);    
 
     return 0;
 }
