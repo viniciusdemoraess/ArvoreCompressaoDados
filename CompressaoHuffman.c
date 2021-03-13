@@ -145,39 +145,45 @@ void getByteFrequency(FILE *entrada, unsigned int *listaBytes){ // Usar isso par
 / @param: nó para iniciar a busca, byte a ser buscado, buffer para salvar os nós percorridos, posição para escrever
 **/
 
-bool pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho, unsigned int *listaBytes){
+bool pegaCodigo(nodeArvore *n, byte c, char *buffer, int tamanho)
+{
+
     // Caso base da recursão:
     // Se o nó for folha e o seu valor for o buscado, colocar o caractere terminal no buffer e encerrar
-    if (!(n->esquerda || n->direita) && n->c == c){
+
+    if (!(n->esquerda || n->direita) && n->c == c)
+    {
         buffer[tamanho] = '\0';
         return true;
     }
-    else{
+    else
+    {
         bool encontrado = false;
 
         // Se existir um nó à esquerda
-        if (n->esquerda){
+        if (n->esquerda)
+        {
             // Adicione '0' no bucket do buffer correspondente ao 'tamanho' nodeAtual
-            buffer[tamanho] = '1';
+            buffer[tamanho] = '0';
 
             // fazer recursão no nó esquerdo
-            encontrado = pegaCodigo(n->esquerda, c, buffer, tamanho + 1, listaBytes);
-
+            encontrado = pegaCodigo(n->esquerda, c, buffer, tamanho + 1);
         }
 
-        if (!encontrado && n->direita){
-            buffer[tamanho] = '0';
-            encontrado = pegaCodigo(n->direita, c, buffer, tamanho + 1, listaBytes);
+        if (!encontrado && n->direita)
+        {
+            buffer[tamanho] = '1';
+            encontrado = pegaCodigo(n->direita, c, buffer, tamanho + 1);
         }
-
-        if (!encontrado){
+        if (!encontrado)
+        {
             buffer[tamanho] = '\0';
-            return false;
         }
+        //printf("%c = %c \n", c, buffer[tamanho]);
+        return encontrado;
     }
-    for(int i=0; i<=256; i++){
-        printf("%d || %c \n", listaBytes[i], buffer[i]);
-    }
+
+
 }
 
 nodeArvore *BuildHuffmanTree(unsigned *listaBytes){
@@ -240,45 +246,45 @@ void FreeHuffmanTree(nodeArvore *n){
 void erroArquivo(){
     printf("Arquivo nao encontrado\n");
     exit(0);
-}/*
-char find(unsigned *listaBytes, nodeArvore *n) {
-    int compvalue;
-    char resposta[256]; 
-    // Passamos a folha
-    if (n == NULL)
-        return 0;
-    for(int i=0; i < 256; i++){
-        compvalue = strcmp(listaBytes[i], n->c);
-        if (compvalue == 0) {
-            // encontrado
-            listaBytes[i] = n->c;
-            return 1;
-        }
-        // desce no nível da árvore
-        if (compvalue > 0)
-            return find(listaBytes[i], n->direita);
-    }   
-    return find(listaBytes, n->esquerda);
-}*/
-
-/*void printa(nodeArvore *n, unsigned int *listaBytes){
-    char buffer[256] = {0};
-    byte c;
-    printf("---------------TABELA--------------\n");
-    for(int i=0; i< 256; i++){
-        printf(" %d  == %c\n", listaBytes[i]);
-    }
 }
-*/
+
 int execution(const char *t){    
     //abrindo o arquivo txt em modo "somente leitura"
     FILE *Arq = fopen(t, "r");
+    char buffer[1024] = {0};
+    char c;
+    int i = 0, flag=0, j=0;
+    char vetor[256];
     unsigned listaBytes[256] = {0};
     if(!Arq) erroArquivo();    
     getByteFrequency(Arq, listaBytes);
-    nodeArvore *raiz = BuildHuffmanTree(listaBytes);        
-    //fread(listaBytes, 256, sizeof(listaBytes[0]), Arq);        
-    printa(raiz, listaBytes);
+    nodeArvore *raiz = BuildHuffmanTree(listaBytes);    
+    c = getc(Arq);
+    vetor[i] = c;
+    i++;
+    do{
+        c = getc(Arq);
+        for(j=0; j<i; j++){
+            if(vetor[j] == c){
+                flag=1;
+            }else{
+                flag=0;
+            }
+        }
+        if(flag==0){
+            vetor[i] = c;
+            i++;
+        }
+    }while(c!=EOF);    
+    printf("-----TABELA-----\n"); 
+    for(j=0; j<i; j++){
+        pegaCodigo(raiz, vetor[j], buffer, 0);  
+        printf("%c     ", vetor[j]);
+         for(char *i=buffer; *i; i++){
+            printf("%c", *i);
+        } 
+        printf("\n");
+    }
     fclose(Arq);
 }
 
