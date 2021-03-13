@@ -277,7 +277,7 @@ int execution(const char *t){
         }
     }while(c!=EOF);    
     printf("-----TABELA-----\n"); 
-    for(j=0; j<i; j++){
+    for(j=0; j<i-1; j++){
         pegaCodigo(raiz, vetor[j], buffer, 0);  
         printf("%c     ", vetor[j]);
          for(char *i=buffer; *i; i++){
